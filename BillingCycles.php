@@ -6,7 +6,7 @@ class BillingCycles {
 		'admin_menu_category' => 'Ordering',
 		'admin_menu_name' => 'Billing Cycles',
 		'admin_menu_icon' => '<i class="icon-clock"></i>',
-		'description' => 'Control how often your clients should pay you for a product or service.',
+		'description' => 'Configure Billing Cycles that can be applied to Plans.',
 	);
 	function list_billing_cycles() {
 		global $billic, $db;
@@ -17,6 +17,14 @@ class BillingCycles {
 		}
 		unset($billingcycles_raw);
 		return $billingcycles;
+	}
+	function toMonthsTime($time) {
+		$daySeconds = 2592000;
+		$rem = $time % $daySeconds;
+		if ($rem===0) {
+			return floor($time / $daySeconds).' Months';
+		}
+		return $time.' Seconds';
 	}
 	function admin_area() {
 		global $billic, $db;
@@ -127,12 +135,12 @@ class BillingCycles {
 		echo '<a href="New/" class="btn btn-success"><i class="icon-plus"></i> New Billing Cycle</a>';
 		$billic->show_errors();
 		echo '<div style="float: right;padding-right: 40px;">Showing ' . $pagination['start_text'] . ' to ' . $pagination['end_text'] . ' of ' . $total . ' Billing Cycles</div>';
-		echo '<table class="table table-striped"><tr><th>Name</th><th>Display Name 1</th><th>Display Name 2</th><th>Seconds</th><th>Price Multiplier</th><th>Discount</th><th>Actions</th></tr>';
+		echo '<table class="table table-striped"><tr><th>Name</th><th>Display Name 1</th><th>Display Name 2</th><th>Billing Time</th><th>Price Multiplier</th><th>Discount</th><th>Actions</th></tr>';
 		if (empty($billingcycles)) {
 			echo '<tr><td colspan="20">No Billing Cycles matching filter.</td></tr>';
 		}
 		foreach($billingcycles as $billingcycle) {
-			echo '<tr><td><a href="/Admin/BillingCycles/Name/'.urlencode($billingcycle['name']).'/">'.safe($billingcycle['name']).'</a></td><td>'.$billingcycle['displayname1'].'</td><td>'.$billingcycle['displayname2'].'</td><td>'.$billingcycle['seconds'].'</td><td>'.$billingcycle['multiplier'].'</td><td>'.$billingcycle['discount'].'%</td><td>';
+			echo '<tr><td><a href="/Admin/BillingCycles/Name/'.urlencode($billingcycle['name']).'/">'.safe($billingcycle['name']).'</a></td><td>'.$billingcycle['displayname1'].'</td><td>'.$billingcycle['displayname2'].'</td><td>'.$this->toMonthsTime($billingcycle['seconds']).'</td><td>'.$billingcycle['multiplier'].'</td><td>'.$billingcycle['discount'].'%</td><td>';
 			echo '<a href="/Admin/BillingCycles/Name/'.urlencode($billingcycle['name']).'/" class="btn btn-primary btn-xs"><i class="icon-edit-write"></i> Edit</a>';
 			echo '&nbsp;<a href="/Admin/BillingCycles/Delete/'.urlencode($billingcycle['name']).'/"  class="btn btn-danger btn-xs" title="Delete" onClick="return confirm(\'Are you sure you want to delete?\');"><i class="icon-remove"></i> Delete</a>';
 			echo '</td></tr>';
